@@ -1,9 +1,13 @@
-class Chatbot:
-    def test(self):
-        return ("hola mundo")
+#main from eva01
+#you can (NOT) chat Alone
+from fastapi import FastAPI
+from src.routes.conversation import router
 
 
+app = FastAPI()
 
-test= Chatbot()
+@app.get("/")
+def read_root():
+    return {"message": "Hola, Chavots"}
 
-print(test.test())
+app.include_router(router)
