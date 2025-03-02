@@ -1,0 +1,10 @@
+venv/
+*.pyc
+*.pyo
+__pycache__/
+.vscode/
+.idea/
+.DS_Store   # (para MacOS)
+Thumbs.db   # (para Windows)
+*.log
+.env
