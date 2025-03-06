@@ -1,90 +1,114 @@
-import openai
 import os
 
-from fastapi import Depends
 from openai import OpenAI
-from sqlalchemy.orm import Session
 
 from src.config.const import OPENAI_API_KEY
-from src.database.add import add_new_message
-from src.database.get import get_chat_history
-from src.models.conversation import Conversation
-import openai
+from src.database.add import add_new_message, add_new_conversation
+from src.database.get import get_chat_history, get_last_chat
+from src.eva.validation import valid_final_response
 
 
+def create_conversation(message):
+    print(message)
+    new_conversation = add_new_conversation(message)
+
+    print(new_conversation)
+
+    return new_conversation["conversation_id"]
 
 
 def check_chat_history(conversation_id):
-    print("todo lions")
-    db_chat=get_chat_history(conversation_id)
-    #logic for bd
+    history_db = []
+
+    db_chat = get_chat_history(conversation_id)
+
+    for chat in db_chat:
+        conversacion_dict = {k: v for k, v in vars(chat).items() if k != "_sa_instance_state"}
+
+        history_db.append(conversacion_dict)
+
+    return history_db
 
 
-    return db_chat
-
-
-def save_response_message(message, response_message):
-
-    add_new_message(message)
-    add_new_message(response_message)
+def save_response_message(message, user, response_message, bot, conversation_id):
+    add_new_message(message, conversation_id, user)
+    add_new_message(response_message, conversation_id, bot)
 
     pass
 
 
-def eva_testmode_01(conversation_id, message):
-
-
+def eva_testmode_01(conversation_id, message, original_message):
     client = OpenAI(
         api_key=os.environ.get(OPENAI_API_KEY),
 
     )
-    print("eva_testmode_01")
-    debate_history = []
 
+    debate_history = []
+    print(conversation_id)
     if conversation_id:
 
-        debate_history =check_chat_history(conversation_id)
+        debate_history_messages = check_chat_history(conversation_id)
+        for regis in debate_history_messages:
+            if regis["usuario"] == "eva":
+                role = "assistant"
+            else:
+                role = "user"
 
-
-
-
-
-    #TODO: validate roles
+            debate_history.append({"role": role, "content": regis["mensaje"]})
+    # TODO: validate roles
 
     system_message = {
         "role": "system",
-        "content": "Eres un experto en debates. Siempre argumentas de manera lógica, respetuosa y detallada."
+        "content": (
+            "Eres un experto en debates. Siempre argumentas de manera lógica, respetuosa y detallada. "
+            "Defiende o ataca una postura de manera convincente, según lo que indique el usuario. "
+            "Mantén el tono adecuado según la conversación y haz respuestas concisas pero efectivas."
+        )
     }
     assistant_message = {
         "role": "assistant",
-        "content": "Soy un defensor de la inteligencia artificial. Creo que su impacto en la sociedad será positivo y puede traer grandes beneficios a todos los niveles."
+        "content": "Estoy listo para debatir cualquier tema con la postura que se me asigne."
     }
     user_message = {
         "role": "user",
-        "content": message
+        "content": f"menssaje analizado: {message}\n\n"
+                   f"Mensaje original: {original_message}"
     }
     messages = [system_message, assistant_message] + debate_history + [user_message]
-
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=messages
+        messages=messages,
+        max_tokens=50,
+        temperature=0.7,
+        top_p=0.95
     )
 
+    message_history = get_last_chat(conversation_id)
+    his_msg = []
 
+    if message_history:
+        for msg in message_history:
+            mssg_dict = {k: v for k, v in vars(msg).items() if k != "_sa_instance_state"}
 
+            evangelion = {
+                "role": mssg_dict["usuario"],
+                "message": mssg_dict["mensaje"]
+            }
 
-    response_message = [{
-        "role": "user",
-        "message": message
+            his_msg.append(evangelion)
 
-    },{"role": "eva",
-       "message":response.choices[0].message.content}]
+    final_model_test = valid_final_response(response.choices[0].message.content)
 
+    response_message = [
+        {"conversation_id": conversation_id},
 
-    save_response_message(message, response.choices[0].message.content)
+        his_msg, {
+            "role": "user",
+            "message": original_message
 
+        }, {"role": "eva",
+            "message": final_model_test}]
 
-
+    save_response_message(message, "user", final_model_test, "eva", conversation_id)
 
     return {"response": response_message}
-

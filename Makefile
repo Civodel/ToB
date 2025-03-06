@@ -1,5 +1,7 @@
 VENV=venv
 PYTHON=$(VENV)/bin/python
+DOCKER_COMPOSE = docker-compose
+SERVICE_NAME = eva01
 
 ifeq ($(OS),Windows_NT)
     ACTIVATE=$(VENV)\Scripts\activate
@@ -14,7 +16,6 @@ make:
 	$(info)  #list of possible commands
 
 
-
 install:
 	python -m venv $(VENV)
 	$(ACTIVATE) && pip install --upgrade pip
@@ -24,9 +25,14 @@ test:
 
 
 run:
-	uvicorn src.main:app --reload
+	$(DOCKER_COMPOSE) up -d
 
 
 down:
+	$(DOCKER_COMPOSE) down
 
 clean:
+	$(DOCKER_COMPOSE) down --volumes --remove-orphans
+
+build:
+	$(DOCKER_COMPOSE) build

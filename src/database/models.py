@@ -7,7 +7,7 @@ Base = declarative_base()
 
 class Conversacion(Base):
     __tablename__ = "conversaciones"
-    conversation_id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, primary_key=True, index=True,autoincrement=True)
     message = Column(Integer, nullable=False)
     fecha_inicio = Column(DateTime, default=datetime.utcnow)
 

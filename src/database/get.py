@@ -1,27 +1,28 @@
-from fastapi import APIRouter, Depends
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from sqlalchemy.orm import Session, sessionmaker
-from src.database.db import get_db, SQLALCHEMY_DATABASE_URL
-from src.database.models import Conversacion as dbConverssation
+from src.database.db import SQLALCHEMY_DATABASE_URL
+from src.database.models import Menssagse
 
 
-
-def get_chat_history(conversation_id, ):
-    print("todo pantera")
+def get_chat_history(conversation_id):
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
 
-    db_conversation = session.query(dbConverssation).filter(
-        dbConverssation.conversation_id == conversation_id).first()
+    db_conversation = session.query(Menssagse).filter(
+        Menssagse.conversacion_id == conversation_id).all()
 
-    print("Busqueda perronas")
     return db_conversation
 
 
+def get_last_chat(conversation_id):
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    SessionLocal = sessionmaker(bind=engine)
+    session = SessionLocal()
 
+    last_messages = session.query(Menssagse).filter(
+        Menssagse.conversacion_id == conversation_id
+    ).order_by(Menssagse.id.desc()).limit(5).all()
 
-
-
-
+    return last_messages
