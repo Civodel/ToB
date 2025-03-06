@@ -22,7 +22,8 @@ install:
 	$(ACTIVATE) && pip install -r requirements.txt
 
 test:
-
+	python -m venv $(VENV)
+	python -m pytest -v
 
 run:
 	$(DOCKER_COMPOSE) up -d
