@@ -40,17 +40,16 @@ def combine_responses(openai_response: str) -> str:
 
 @router.post("/chat/")
 async def chat(conversation: Conversation):
+    acceptable_user_message = ''
     if not conversation.conversation_id:
-        conversation_id = create_conversation(conversation.message)
-        print(conversation_id)
+        acceptable_user_message, validate_message = valid_user_input(conversation.message)
 
+        if acceptable_user_message == False:
+            return validate_message
+
+        else:
+            conversation_id = create_conversation(conversation.message)
     else:
         conversation_id = conversation.conversation_id
 
-    # TODO valdiate entry for user
-
-    response, message_validate = valid_user_input(conversation.message)
-    if response == False:
-        return message_validate
-    else:
-        return eva_testmode_01(conversation_id, message_validate, conversation.message)
+    return eva_testmode_01(conversation_id, acceptable_user_message, conversation.message)

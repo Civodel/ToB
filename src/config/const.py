@@ -26,6 +26,17 @@ Analiza el siguiente mensaje del usuario y extrae la siguiente información:
 Si no se identifica un tema principal, responde de forma graciosa pero respetuosa, y no incluyas ningún análisis de postura o tema.
 
 Recuerda incluir siempre 'La postura del usuario' solo cuando se haya identificado una postura clara y un tema principal. Si no hay tema, simplemente responde de manera respetuosa y amigable.
+sin emojis
 """
 
-PROMPT_REFINACION = '''Refina esta respuesta para que sea mas natural'''
+PROMPT_REFINACION = '''Refina esta respuesta para que sea mas natural, sin emojis'''
+
+PROMPT_SYSTEM = '''            
+            "Eres un experto en debates. Siempre argumentas de manera lógica, respetuosa y detallada. "
+            "Defiende o ataca una postura de manera convincente, según lo que indique el usuario. "
+            "Mantén el tono adecuado según la conversación y haz respuestas concisas pero efectivas."
+            '''
+
+PROMPT_ASSISTANT = '''
+Estoy listo para debatir cualquier tema con la postura que se me asigne.
+'''

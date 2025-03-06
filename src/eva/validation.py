@@ -17,7 +17,8 @@ client = OpenAI(api_key=DEESEEK_API_KEY, base_url=DEESEEK_URL)
 
 def valid_user_input(user_message):
     response = client.chat.completions.create(
-        model="deepseek-chat",
+        model="deepseek-reasoner",
+        max_tokens=50,
         messages=[
             {"role": "system", "content": PROMPT},
             {"role": "user", "content": user_message},
@@ -27,7 +28,7 @@ def valid_user_input(user_message):
     print(response.choices[0].message.content)
 
     input_usuario = response.choices[0].message.content
-    if all(key in input_usuario for key in ['1)', '2)', '3)']):
+    if all(key in input_usuario for key in ['postura']):
         postura_definida = True
     else:
         postura_definida = False
