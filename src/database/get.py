@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.database.db import SQLALCHEMY_DATABASE_URL
+from src.database.db import DATABASE_URL
 from src.database.models import Menssagse
 
 
 def get_chat_history(conversation_id):
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
 
@@ -17,7 +17,7 @@ def get_chat_history(conversation_id):
 
 
 def get_last_chat(conversation_id):
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
 

@@ -3,13 +3,13 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.database.db import SQLALCHEMY_DATABASE_URL
+from src.database.db import DATABASE_URL
 from src.database.models import Conversacion as dbConverssation
 from src.database.models import Menssagse
 
 
 def add_new_message(message, conversation_id, role):
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
 
@@ -27,7 +27,7 @@ def add_new_message(message, conversation_id, role):
 
 
 def add_new_conversation(message):
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
 

@@ -2,8 +2,6 @@ from openai import OpenAI
 
 from src.config.const import DEEPSSEEK_API_KEY, PROMPT, PROMPT_REFINACION
 
-DEESEEK_API_KEY = DEEPSSEEK_API_KEY
-
 # sclient = OpenAI(api_key=DEESEEK_API_KEY, base_url="https://api.deepseek.com")
 
 DEESEEK_URL = "https://api.deepseek.com"
@@ -12,7 +10,7 @@ messages = []
 postura_definida = False
 postura_actual = ""
 
-client = OpenAI(api_key=DEESEEK_API_KEY, base_url=DEESEEK_URL)
+client = OpenAI(api_key=DEEPSSEEK_API_KEY, base_url=DEESEEK_URL)
 
 
 def valid_user_input(user_message):
