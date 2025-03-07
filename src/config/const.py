@@ -10,7 +10,7 @@ DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-DEEPSSEEK_API_KEY = os.getenv("DEEPSSEEK_API_KEY")
+DEEPSSEEK_API_KEY = 'sk-36944fc32615462e93b3fdbbf6cef0f4'
 # Configuración general del chatbot
 BOT_NAME = "ChatBot"
 DEFAULT_RESPONSE = "No entendí tu mensaje. ¿Puedes reformularlo?"
