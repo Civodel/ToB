@@ -10,12 +10,12 @@ DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-PROD_SQL_BASE_URL = os.getenv("PROD_DATABASE_URL")
 DEEPSSEEK_API_KEY = os.getenv("DEEPSSEEK_API_KEY")
 DEESEEK_URL = "https://api.deepseek.com/v1"
 BOT_NAME = "TwentyOneBot:Pilot01"
 MAX_HISTORY_MESSAGES = 5
 MODEL_NAME = "test"
+
 debate_keywords = [
     'debatir', 'discutir', 'opinión', 'opinas', 'pensar', 'argumentar', 'argumento', 'postura',
     'desacuerdo', 'contradicción', 'reflexión', 'cuál es tu opinión', '¿qué piensas?', 'qué opinas',
