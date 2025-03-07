@@ -1,4 +1,4 @@
+*.dist-info/
+*.egg-info/
 venv/
-*.pyc
-*.pyo
 __pycache__/
