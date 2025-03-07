@@ -1,3 +1,4 @@
+import logging
 import os
 
 from openai import OpenAI
@@ -5,19 +6,14 @@ from openai import OpenAI
 from src.config.const import OPENAI_API_KEY, PROMPT_SYSTEM, PROMPT_ASSISTANT
 from src.database.add import add_new_message, add_new_conversation
 from src.database.get import get_chat_history, get_last_chat
-from src.eva.validation import valid_final_response
 
 
-def create_conversation(message):
-    print(message)
+def create_conversation(message: str) -> int:
     new_conversation = add_new_conversation(message)
-
-    print(new_conversation)
-
     return new_conversation["conversation_id"]
 
 
-def check_chat_history(conversation_id):
+def check_chat_history(conversation_id: int):
     history_db = []
 
     db_chat = get_chat_history(conversation_id)
@@ -30,79 +26,71 @@ def check_chat_history(conversation_id):
     return history_db
 
 
-def save_response_message(message, user, response_message, bot, conversation_id):
+def save_response_message(message: str, user: str, response_message: str, bot: str, conversation_id: int) -> None:
     add_new_message(message, conversation_id, user)
     add_new_message(response_message, conversation_id, bot)
 
     pass
 
 
-def eva_testmode_01(conversation_id, message, original_message):
-    client = OpenAI(
-        api_key=os.environ.get(OPENAI_API_KEY),
+client = OpenAI(
+    api_key=os.environ.get(OPENAI_API_KEY),
+)
 
-    )
 
-    debate_history = []
+def tob_conversation_logic(conversation_id: int, validated_message: str, original_message: str,
+                           firt_interaction: bool) -> dict:
+    debate_history_messages = check_chat_history(conversation_id) or []
     his_msg = []
-    debate_history_messages = check_chat_history(conversation_id)
+    debate_history = [
+        {"role": "assistant" if regis["usuario"] == "eva" else "user", "content": regis["mensaje"]}
+        for regis in debate_history_messages
+    ]
 
-    for regis in debate_history_messages:
-        if regis["usuario"] == "eva":
-            role = "assistant"
-        else:
-            role = "user"
+    if validated_message == '':
+        user_message = original_message
+    else:
+        user_message = validated_message
 
-        debate_history.append({"role": role, "content": regis["mensaje"]})
-    # TODO: validate roles
+    messages = [
+        {"role": "system", "content": PROMPT_SYSTEM},
+        {"role": "assistant", "content": PROMPT_ASSISTANT},
+        *debate_history[-10:],
+        {"role": "user", "content": f"Mensaje del usuario : {user_message}"}
+    ]
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=80,
+            temperature=0.7,
+            top_p=0.95
+        )
+    except Exception as e:
+        logging.error(f"Error en la API de OpenAI:: {e}")
+        return {"error": "Hubo un problema al interactuar con la API de OpenAI"}
+    try:
+        message_history = get_last_chat(conversation_id) or []
+        his_msg = [{"role": msg.usuario, "message": msg.mensaje} for msg in message_history]
+    except Exception as e:
+        logging.error(f"Error al guardar el mensaje: {e}")
+        return {"error": "No se pudo obtener el historial de mensajes"}
 
-    user_final_message = original_message if message == '' else original_message
-    system_message = {
-        "role": "system",
-        "content": PROMPT_SYSTEM
+    final_model_test = response.choices[0].message.content
+
+    '''if firt_interaction == False:
+        print('second call')
+        final_model_test = valid_final_response(response.choices[0].message.content, user_message)'''
+    try:
+        save_response_message(original_message, "user", final_model_test, "eva", conversation_id)
+    except Exception as e:
+        logging.error(f"Error al obtener el historial de conversación: {e}")
+        return {"error": "No se pudo guardar el mensaje"}
+    return {
+        "response": [
+            {"conversation_id": conversation_id},
+            his_msg,
+            {"role": "user", "message": original_message},
+            {"role": "ToB", "message": final_model_test}
+        ]
     }
-    assistant_message = {
-        "role": "assistant",
-        "content": PROMPT_ASSISTANT
-    }
-    user_message = {
-        "role": "user",
-        "content": f"menssaje del cliente: {user_final_message}\n\n"
-    }
-    messages = [system_message, assistant_message] + debate_history + [user_message]
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-        max_tokens=50,
-        temperature=0.7,
-        top_p=0.95
-    )
-
-    message_history = get_last_chat(conversation_id)
-
-    if message_history:
-        for msg in message_history:
-            mssg_dict = {k: v for k, v in vars(msg).items() if k != "_sa_instance_state"}
-
-            evangelion = {
-                "role": mssg_dict["usuario"],
-                "message": mssg_dict["mensaje"]
-            }
-
-            his_msg.append(evangelion)
-
-    final_model_test = valid_final_response(response.choices[0].message.content)
-
-    response_message = [
-        {"conversation_id": conversation_id},
-
-        his_msg, {
-            "role": "user",
-            "message": original_message
-
-        }, {"role": "eva",
-            "message": final_model_test}]
-
-    save_response_message(message, "user", final_model_test, "eva", conversation_id)
-
-    return {"response": response_message}

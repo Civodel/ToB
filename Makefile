@@ -1,3 +1,5 @@
+# Makefile Mejorado
+
 VENV=venv
 PYTHON=$(VENV)/bin/python
 DOCKER_COMPOSE = docker-compose
@@ -11,29 +13,58 @@ else
     CLEAN_CMD=rm -rf __pycache__ *.pyc *.pyo *~
 endif
 
-make:
+# Tarea principal: mostrar las tareas disponibles
+help:
+	@echo "Tareas disponibles:"
+	@echo "  make install   - Instalar dependencias"
+	@echo "  make reinstall - Instala dependencias en el entorno virtual"
+	@echo "  make run       - Ejecutar el proyecto"
+	@echo "  make test      - Ejecutar pruebas"
+	@echo "  make clean     - Limpiar los archivos temporales"
+	@echo "  make down      - Detener los contenedores de Docker"
+	@echo "  make build     - Construir los contenedores de Docker"
 
-	$(info)  #list of possible commands
-
-
+# Instalar dependencias en un entorno virtual
 install:
+	@echo "Creando el entorno virtual..."
 	python -m venv $(VENV)
 	$(ACTIVATE) && pip install --upgrade pip
 	$(ACTIVATE) && pip install -r requirements.txt
 
-test:
-	python -m venv $(VENV)
+reinstall:
+	@echo "Reinstalando dependencias..."
+
+	pip install --upgrade pip
+	pip install -r requirements.txt
+
+
+
+# Ejecutar pruebas con pytest
+test: $(VENV)/bin/activate
+	@echo "Ejecutando pruebas..."
 	python -m pytest -v
 
-run:
+# Ejecutar el proyecto con Docker Compose
+run: $(VENV)/bin/activate
+	@echo "Ejecutando el proyecto con Docker..."
 	$(DOCKER_COMPOSE) up -d
 
-
+# Detener los contenedores de Docker
 down:
+	@echo "Deteniendo contenedores..."
 	$(DOCKER_COMPOSE) down
 
+# Limpiar los archivos temporales y volúmenes de Docker
 clean:
+	@echo "Limpiando archivos temporales..."
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans
+	$(CLEAN_CMD)
 
+# Construir los contenedores de Docker
 build:
+	@echo "Construyendo los contenedores Docker..."
 	$(DOCKER_COMPOSE) build
+
+# Regla para verificar si el entorno virtual ya está creado
+$(VENV)/bin/activate:
+	@echo "Entorno virtual no encontrado. Ejecutando 'make install' para crear el entorno..."
