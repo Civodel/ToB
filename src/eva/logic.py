@@ -51,7 +51,7 @@ def tob_conversation_logic(conversation_id: int, validated_message: str, origina
         user_message = original_message
     else:
         user_message = validated_message
-
+    print(debate_history)
     messages = [
         {"role": "system", "content": PROMPT_SYSTEM},
         {"role": "assistant", "content": PROMPT_ASSISTANT},
@@ -86,10 +86,11 @@ def tob_conversation_logic(conversation_id: int, validated_message: str, origina
     except Exception as e:
         logging.error(f"Error al obtener el historial de conversación: {e}")
         return {"error": "No se pudo guardar el mensaje"}
+
     return {
         "response": [
             {"conversation_id": conversation_id},
-            his_msg,
+            his_msg[::-1],
             {"role": "user", "message": original_message},
             {"role": "ToB", "message": final_model_test}
         ]
