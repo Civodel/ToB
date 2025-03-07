@@ -1,48 +1,51 @@
+import openai
 from openai import OpenAI
 
-from src.config.const import DEEPSSEEK_API_KEY, PROMPT, PROMPT_REFINACION
+from src.config.const import PROMPT, DEEPSSEEK_API_KEY, DEESEEK_URL, PROMPT_REFINACION
 
-# sclient = OpenAI(api_key=DEESEEK_API_KEY, base_url="https://api.deepseek.com")
-
-DEESEEK_URL = "https://api.deepseek.com"
-
-messages = []
-postura_definida = False
-postura_actual = ""
+openai.api_key = DEEPSSEEK_API_KEY
+openai.api_base = DEESEEK_URL
 
 client = OpenAI(api_key=DEEPSSEEK_API_KEY, base_url=DEESEEK_URL)
 
 
-def valid_user_input(user_message):
-    response = client.chat.completions.create(
-        model="deepseek-reasoner",
-        max_tokens=50,
-        messages=[
-            {"role": "system", "content": PROMPT},
-            {"role": "user", "content": user_message},
-        ],
-        stream=False
-    )
-    print(response.choices[0].message.content)
+def valid_user_input(user_message: str) -> list:
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            max_tokens=20,
+            messages=[
+                {"role": "system", "content": PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            stream=False,
+            temperature=0.7,
+            top_p=1,
+        )
+        print(response.choices[0].message.content)
 
-    input_usuario = response.choices[0].message.content
-    if all(key in input_usuario for key in ['postura']):
-        postura_definida = True
-    else:
-        postura_definida = False
+        input_usuario = response.choices[0].message.content
 
-    return postura_definida, input_usuario
+        if 'postura' in input_usuario:
+            return [True, input_usuario]
+
+        return [False, input_usuario]
+    except Exception as e:
+        print("Error:", e)
+        return [False, "Ocurrió un error. Intenta de nuevo."]
 
 
-def valid_final_response(pre_response):
-    response = client.chat.completions.create(
+def valid_final_response(pre_response, user_message):
+    refined_response = client.chat.completions.create(
         model="deepseek-chat",
         messages=[
-            {"role": "system", "content": PROMPT_REFINACION},
-            {"role": "user", "content": pre_response},
+            {"role": "system", "content": PROMPT_REFINACION.format(respuesta_original=pre_response)}
         ],
-        stream=False
-    )
-    print(response.choices[0].message.content)
+        max_tokens=100,  # Prueba con menos tokens
+        temperature=0.7,
+        top_p=0.95,
+        stream=False,
 
-    return response.choices[0].message.content
+    )
+
+    return refined_response.choices[0].message.content
