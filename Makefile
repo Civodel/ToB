@@ -17,6 +17,7 @@ endif
 help:
 	@echo "Tareas disponibles:"
 	@echo "  make install   - Instalar dependencias"
+	@echo "  make reinstall - Instala dependencias en el entorno virtual"
 	@echo "  make run       - Ejecutar el proyecto"
 	@echo "  make test      - Ejecutar pruebas"
 	@echo "  make clean     - Limpiar los archivos temporales"
@@ -29,6 +30,14 @@ install:
 	python -m venv $(VENV)
 	$(ACTIVATE) && pip install --upgrade pip
 	$(ACTIVATE) && pip install -r requirements.txt
+
+reinstall:
+	@echo "Reinstalando dependencias..."
+
+	pip install --upgrade pip
+	pip install -r requirements.txt
+
+
 
 # Ejecutar pruebas con pytest
 test: $(VENV)/bin/activate

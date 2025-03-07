@@ -2,12 +2,13 @@ version: "3.8"
 
 services:
   app:
+    image: python:3.11
     build: .
     container_name: evangeliontestmode01
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=${mysql://vq87a2wc0jge3nyt:hidw10hcb40ds5km@nnmeqdrilkem9ked.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/kkjc39umeunk66pp}
+      - DATABASE_URL="mysql://vq87a2wc0jge3nyt:hidw10hcb40ds5km@nnmeqdrilkem9ked.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/kkjc39umeunk66pp"
     volumes:
       - .:/app
 
