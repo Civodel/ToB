@@ -7,12 +7,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DB=${DB_NAME}
-    depends_on:
-      - db
+      - DATABASE_URL=${DATABASE_URL}
     volumes:
       - .:/app
 
