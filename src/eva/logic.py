@@ -51,7 +51,6 @@ def tob_conversation_logic(conversation_id: int, validated_message: str, origina
         user_message = original_message
     else:
         user_message = validated_message
-    print(debate_history)
     messages = [
         {"role": "system", "content": PROMPT_SYSTEM},
         {"role": "assistant", "content": PROMPT_ASSISTANT},

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.eva.conversation_validation import handle_conversation_logic
+from src.eva.conversation_validation import handle_conversation_logic, handle_conversation_for_agno
 from src.models.conversation import Conversation
 
 router = APIRouter()
@@ -8,5 +8,9 @@ router = APIRouter()
 
 @router.post("/chat/")
 async def chat_with_tob(conversation: Conversation) -> dict:
-    response_to_user = await handle_conversation_logic(conversation)
-    return response_to_user
+    return await handle_conversation_logic(conversation)
+
+
+@router.post("/chat/agno")
+async def chat_with_agno(conversation: Conversation) -> dict:
+    return await  handle_conversation_for_agno(conversation)
