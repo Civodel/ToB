@@ -25,6 +25,7 @@ except Exception as e:
     logging.error(f"Error al obtener BOT_ID: {e}")
 
 
+
 @slack_router.post("/slack/events")
 async def handle_slack_event(req: Request):
     payload = await req.json()
@@ -44,7 +45,6 @@ async def handle_slack_event(req: Request):
         logging.info(f"Ignorando mensaje del propio bot: {event}")
         return {"status": "ok"}
     
-    logging.info(f"Procesando mensaje de usuario: {event['user']}")
     
     if (event.get("type") == "app_mention" or 
         (event.get("type") == "message" and not event.get("thread_ts")) or
