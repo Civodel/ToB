@@ -1,4 +1,3 @@
-from src.agno.adapter import get_agent
 from src.eva.logic import create_conversation, tob_conversation_logic
 from src.eva.validation import valid_user_input
 from src.models.conversation import Conversation
@@ -23,7 +22,9 @@ async def handle_conversation_logic(conversation: Conversation) -> dict:
     return tob_conversation_logic(conversation_id, validate_message, conversation.message, first_interaction)
 
 
-async def handle_conversation_for_agno(conversation: Conversation) -> dict:
+
+
+'''async def handle_conversation_for_agno(conversation: Conversation) -> dict:
     print("entrando en la funcion")
 
     acceptable_user_message = False
@@ -63,3 +64,4 @@ async def handle_conversation_for_agno(conversation: Conversation) -> dict:
     agent.memory.db.add_message(user_id, role="assistant", content=response["response"][-1]["message"])
 
     return response
+'''
