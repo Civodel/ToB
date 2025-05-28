@@ -1,11 +1,14 @@
 import logging
 import os
+from typing import Optional
 
 from openai import OpenAI
+from mem0 import Memory  # type: ignore
 
 from src.config.const import OPENAI_API_KEY, PROMPT_SYSTEM, PROMPT_ASSISTANT
 from src.database.add import add_new_message, add_new_conversation
 from src.database.get import get_chat_history, get_last_chat
+from src.memory.memory_manager import MemoryManager
 
 
 def create_conversation(message: str) -> int:
@@ -39,13 +42,17 @@ client = OpenAI(
 
 
 def tob_conversation_logic(conversation_id: int, validated_message: str, original_message: str,
-                           firt_interaction: bool) -> dict:
+                           firt_interaction: bool,user_id: Optional[str]) -> dict:
+
+    memory_manager = MemoryManager()
     debate_history_messages = check_chat_history(conversation_id) or []
     his_msg = []
     debate_history = [
         {"role": "assistant" if regis["usuario"] == "eva" else "user", "content": regis["mensaje"]}
         for regis in debate_history_messages
     ]
+
+
 
     if validated_message == '':
         user_message = original_message
@@ -76,6 +83,11 @@ def tob_conversation_logic(conversation_id: int, validated_message: str, origina
         return {"error": "No se pudo obtener el historial de mensajes"}
 
     final_model_test = response.choices[0].message.content
+
+    memory_manager.save_user_memory(str(user_id), str(conversation_id), [
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": final_model_test}
+    ])
 
     '''if firt_interaction == False:
         print('second call')

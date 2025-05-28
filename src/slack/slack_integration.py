@@ -33,8 +33,7 @@ async def handle_slack_event(req: Request):
         conversation_object = Conversation(conversation_id=1, message=text)
 
         response_json = await handle_conversation_logic(conversation_object)
-        print("mensaje respuesta")
-        print(response_json.get("response")[3].get("message"))
+
 
         try:
             client.chat_postMessage(channel=channel, text=response_json.get("response")[3].get("message"))

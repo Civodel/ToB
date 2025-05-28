@@ -11,6 +11,7 @@ DB_NAME = os.getenv("DB_NAME")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEEPSSEEK_API_KEY = os.getenv("DEEPSSEEK_API_KEY")
+MEM0_API_KEY = os.getenv("MEM0_API_KEY")
 DEESEEK_URL = "https://api.deepseek.com/v1"
 BOT_NAME = "TwentyOneBot:Pilot01"
 MAX_HISTORY_MESSAGES = 5

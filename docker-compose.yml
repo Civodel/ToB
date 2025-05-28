@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
       - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
+      - MEM0_API_KEY=${MEM0_API_KEY}
     volumes:
       - .:/app
 
