@@ -32,6 +32,8 @@ async def handle_slack_event(req: Request):
     if event['user'] == BOT_ID:
         return {"status": "ok"}
 
+    print(event['user'])
+
     if event.get("type") == "app_mention" or event.get("type") == "message":
         channel = event["channel"]
         user = event["user"]
