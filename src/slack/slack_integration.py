@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 
@@ -76,9 +77,11 @@ async def handle_slack_event(req: Request):
         channel = event["channel"]
         user = event["user"]
         text = event["text"]
+        logging.info(f"Procesando mensaje: {channel}")
+        
         
         # Usar el ID del canal como ID de conversación para mantener contexto
-        conversation_object = Conversation(conversation_id=channel, message=text)
+        conversation_object = Conversation(conversation_id=1, message=text)
         
         # Pasar el user_id a la función de conversación
         response_json = await handle_conversation_logic(conversation_object, user_id=user)
