@@ -63,8 +63,7 @@ class MemoryManager:
         except Exception as e:
             print(f"❌ Error al inicializar memoria: {str(e)}")
             # Fallback a memoria local si hay error
-            self.memory = Memory.from_config({"vector_store": {"provider": "qdrant", "config": {"location": ":memory:"}}})
-
+      
 
     
     def save_user_memory(
