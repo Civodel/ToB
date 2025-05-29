@@ -80,14 +80,16 @@ async def handle_slack_event(req: Request):
                 thread_ts=thread_ts
             )
             
+            # Intentar añadir una reacción con un emoji más común
             try:
-                client.reactions_add(
+                reaction_response = client.reactions_add(
                     channel=channel,
                     timestamp=thread_ts,
-                    name="hourglass_flowing_sand"  
+                    name="thinking_face"  # Emoji más común y seguro de que existe
                 )
-            except SlackApiError:
-                pass
+                print(f"Reacción añadida correctamente: {reaction_response}")
+            except SlackApiError as e:
+                print(f"Error al añadir reacción: {e.response['error']}")
                 
             time.sleep(3)
             
@@ -99,14 +101,16 @@ async def handle_slack_event(req: Request):
                 text=response_text
             )
             
+            # Eliminar la reacción al finalizar (usando el mismo emoji que añadimos)
             try:
                 client.reactions_remove(
                     channel=channel,
                     timestamp=thread_ts,
-                    name="hourglass_flowing_sand"
+                    name="thinking_face"
                 )
-            except SlackApiError:
-                pass
+                print("Reacción eliminada correctamente")
+            except SlackApiError as e:
+                print(f"Error al eliminar reacción: {e.response['error']}")
                 
         except SlackApiError as e:
             print(f"Error: {e.response['error']}")
