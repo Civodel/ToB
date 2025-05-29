@@ -1,9 +1,9 @@
 from typing import Dict, List
-
+import os
+import boto3
+from opensearchpy import RequestsHttpConnection, AWSV4SignerAuth
 from mem0 import Memory #type: ignore
 from src.config.const import MEM0_API_KEY, AWS_ACCESS_LINK
-import boto3
-from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 
 
 """
@@ -15,32 +15,60 @@ messages = [
 client.add(messages, user_id="alex", metadata={"food": "vegan"})
 
 """
-region = 'us-west-2'
-service = 'aoss'
-credentials = boto3.Session().get_credentials()
-auth = AWSV4SignerAuth(credentials, region, service)
-
-config = {
-    "vector_store": {
-        "provider": "opensearch",
-        "config": {
-            "collection_name": "mem0",
-            "host": AWS_ACCESS_LINK,
-            "port": 443,
-            "http_auth": auth,
-            "embedding_model_dims": 1024,
-            "connection_class": RequestsHttpConnection,
-            "pool_maxsize": 20,
-            "use_ssl": True,
-            "verify_certs": True
+# Configuración para OpenSearch en AWS
+def get_mem0_config():
+    # Región y servicio AWS
+    region = os.environ.get('AWS_REGION', 'us-west-1')
+    # Usar 'aoss' para Amazon OpenSearch Serverless o 'es' para OpenSearch Service
+    service = os.environ.get('AWS_SERVICE', 'aoss')
+    
+    # Obtener credenciales AWS del entorno, archivo ~/.aws/credentials, o rol IAM
+    session = boto3.Session()
+    credentials = session.get_credentials()
+    
+    # Verificar si tenemos credenciales
+    if not credentials:
+        raise ValueError("No se pudieron encontrar credenciales AWS. Configura AWS_ACCESS_KEY_ID y AWS_SECRET_ACCESS_KEY")
+    
+    # Crear autenticación AWS v4
+    auth = AWSV4SignerAuth(credentials, region, service)
+    
+    # Configuración para mem0 con OpenSearch
+    config = {
+        "vector_store": {
+            "provider": "opensearch",
+            "config": {
+                "collection_name": "mem0",  # Nombre de tu colección/índice
+                "host": AWS_ACCESS_LINK,     # URL de tu dominio OpenSearch
+                "port": 443,                # Puerto estándar para HTTPS
+                "http_auth": auth,
+                "embedding_model_dims": 1536,  # Dimensión para embeddings (1536 para OpenAI)
+                "connection_class": RequestsHttpConnection,
+                "use_ssl": True,
+                "verify_certs": True,
+                "retry_on_timeout": True,
+                "max_retries": 3
+            }
+        },
+        "llm": {
+            "provider": "openai",  # Usar OpenAI como LLM por defecto
+            "model": "gpt-4"
         }
     }
-}
+    
+    return config
 
 
 class MemoryManager:
     def __init__(self, memory: Memory = None):
-        self.memory = memory if memory else Memory.from_config(config)
+        try:
+            # Usar memoria existente o crear una nueva con la configuración
+            self.memory = memory if memory else Memory.from_config(get_mem0_config())
+            print("✅ Conexión exitosa a la memoria con OpenSearch")
+        except Exception as e:
+            print(f"❌ Error al inicializar memoria: {str(e)}")
+            # Fallback a memoria local si hay error
+            self.memory = Memory.from_config({"vector_store": {"provider": "qdrant", "config": {"location": ":memory:"}}})
 
 
     
