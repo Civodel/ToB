@@ -71,21 +71,22 @@ async def handle_slack_event(req: Request):
         response_json = await handle_conversation_logic(conversation_object, user_id=user)
 
 
+
         try:
             thread_ts = event.get("ts")
             
             placeholder_response = client.chat_postMessage(
                 channel=channel,
-                text=":thinking_face: Estoy pensando...",
+                text=":thinking_face: Estoy pensando....",
                 thread_ts=thread_ts
             )
+
             
-            # Intentar añadir una reacción con un emoji más común
             try:
                 reaction_response = client.reactions_add(
                     channel=channel,
                     timestamp=thread_ts,
-                    name="thinking_face"  # Emoji más común y seguro de que existe
+                    name="thinking_face"
                 )
                 print(f"Reacción añadida correctamente: {reaction_response}")
             except SlackApiError as e:
@@ -101,7 +102,6 @@ async def handle_slack_event(req: Request):
                 text=response_text
             )
             
-            # Eliminar la reacción al finalizar (usando el mismo emoji que añadimos)
             try:
                 client.reactions_remove(
                     channel=channel,

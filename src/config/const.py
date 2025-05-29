@@ -12,10 +12,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEEPSSEEK_API_KEY = os.getenv("DEEPSSEEK_API_KEY")
 MEM0_API_KEY = os.getenv("MEM0_API_KEY")
+AWS_ACCESS_LINK = os.getenv("AWS_ACCESS_LINK")
 DEESEEK_URL = "https://api.deepseek.com/v1"
 BOT_NAME = "TwentyOneBot:Pilot01"
 MAX_HISTORY_MESSAGES = 5
 MODEL_NAME = "test"
+
 
 debate_keywords = [
     'debatir', 'discutir', 'opinión', 'opinas', 'pensar', 'argumentar', 'argumento', 'postura',

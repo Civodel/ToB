@@ -1,7 +1,10 @@
 from typing import Dict, List
 
-from mem0 import MemoryClient #type: ignore
-from src.config.const import MEM0_API_KEY
+from mem0 import Memory #type: ignore
+from src.config.const import MEM0_API_KEY, AWS_ACCESS_LINK
+import boto3
+from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
+
 
 """
 expected input
@@ -12,12 +15,35 @@ messages = [
 client.add(messages, user_id="alex", metadata={"food": "vegan"})
 
 """
+region = 'us-west-2'
+service = 'aoss'
+credentials = boto3.Session().get_credentials()
+auth = AWSV4SignerAuth(credentials, region, service)
+
+config = {
+    "vector_store": {
+        "provider": "opensearch",
+        "config": {
+            "collection_name": "mem0",
+            "host": AWS_ACCESS_LINK,
+            "port": 443,
+            "http_auth": auth,
+            "embedding_model_dims": 1024,
+            "connection_class": RequestsHttpConnection,
+            "pool_maxsize": 20,
+            "use_ssl": True,
+            "verify_certs": True
+        }
+    }
+}
+
 
 class MemoryManager:
-    def __init__(self, memory: MemoryClient = None):
-        self.memory = memory if memory else MemoryClient(
-            api_key=MEM0_API_KEY #only for test
-        ) 
+    def __init__(self, memory: Memory = None):
+        self.memory = memory if memory else Memory.from_config(config)
+
+
+    
     def save_user_memory(
         self,
         user_id: str,
