@@ -37,23 +37,18 @@ def get_mem0_config():
     config = {
         "vector_store": {
             "provider": "opensearch",
-            "config": {
-                "collection_name": "mem0",  # Nombre de tu colección/índice
-                "host": AWS_ACCESS_LINK,     # URL de tu dominio OpenSearch
-                "port": 443,                # Puerto estándar para HTTPS
+            "config": {           
+                "collection_name": "mem0",
+                "host": AWS_ACCESS_LINK,
+                "port": 443,
                 "http_auth": auth,
-                "embedding_model_dims": 1536,  # Dimensión para embeddings (1536 para OpenAI)
+                "embedding_model_dims": 1024,
                 "connection_class": RequestsHttpConnection,
+                "pool_maxsize": 20,
                 "use_ssl": True,
-                "verify_certs": True,
-                "retry_on_timeout": True,
-                "max_retries": 3
+                "verify_certs": True
             }
         },
-        "llm": {
-            "provider": "openai",  # Usar OpenAI como LLM por defecto
-            "model": "gpt-4"
-        }
     }
     
     return config
