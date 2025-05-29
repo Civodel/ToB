@@ -89,6 +89,8 @@ async def handle_slack_event(req: Request):
             except SlackApiError:
                 pass
                 
+            time.sleep(3)
+            
             response_text = response_json.get("response")[3].get("message")
             
             client.chat_update(
